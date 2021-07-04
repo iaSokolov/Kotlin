@@ -3,8 +3,8 @@ package board
 import board.Direction.*
 import java.util.ArrayList
 
-class Board(override val width: Int) : SquareBoard {
-    private val listCells: ArrayList<Cell> = ArrayList<Cell>()
+open class Board(override val width: Int) : SquareBoard {
+    protected val listCells: ArrayList<Cell> = ArrayList<Cell>()
 
     init {
         for (index in 0 until width * width) {
@@ -68,11 +68,58 @@ class Board(override val width: Int) : SquareBoard {
     }
 }
 
+class Game<T>(width: Int) : GameBoard<T>, Board(width) {
+    private val map: HashMap<Cell, T?> = java.util.HashMap()
+
+    override fun get(cell: Cell): T? = this.map[cell]
+
+
+    override fun set(cell: Cell, value: T?) {
+        this.map[cell] = value
+    }
+
+    override fun filter(predicate: (T?) -> Boolean): Collection<Cell> {
+        val ret: ArrayList<Cell> = ArrayList()
+        this.map.forEach { (cell, value) ->
+            if (predicate(value)) {
+                ret.add(cell)
+            }
+        }
+        return ret;
+    }
+
+    override fun find(predicate: (T?) -> Boolean): Cell? {
+        this.map.forEach { (cell, value) ->
+            if (predicate(value)) {
+                return cell
+            }
+        }
+        return null
+    }
+
+    override fun any(predicate: (T?) -> Boolean): Boolean {
+        this.listCells.forEach { cell: Cell ->
+            if (predicate(this.map[cell]))
+                return true
+        }
+        return false
+    }
+
+    override fun all(predicate: (T?) -> Boolean): Boolean {
+        this.listCells.forEach { cell: Cell ->
+            if (!predicate(this.map[cell]))
+                return false
+        }
+        return true
+    }
+}
+
 fun main() {
-    val b = Board(9)
-    print(b.getCell(10, 1))
+    val c1 = Cell(1, 2)
+    val c2 = Cell(1, 2)
+    print(c1.hashCode())
+    print(c2.hashCode())
 }
 
 fun createSquareBoard(width: Int): SquareBoard = Board(width)
-fun <T> createGameBoard(width: Int): GameBoard<T> = TODO()
-
+fun <T> createGameBoard(width: Int): GameBoard<T> = Game<T>(width)

@@ -4,7 +4,9 @@ import org.junit.Assert
 import org.junit.Test
 import rationals.TestRationals.ComparisonOperation.*
 
-class TestRationals {
+class
+
+TestRationals {
 
     private fun testNormalizedForm(rational: String, normalizedForm: String) {
         Assert.assertEquals("Wrong normalized form for $rational",
